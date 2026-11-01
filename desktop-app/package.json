@@ -1,0 +1,157 @@
+{
+  "name": "mench-ai",
+  "private": true,
+  "version": "0.3.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx,mjs,cjs --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "pretest": "npm run runtime:prepare",
+    "test": "node --test --test-concurrency=1 src/workspace/*.test.js",
+    "runtime:prepare": "node tools/prepare-runtime.mjs && node tools/prepare-npm-runtime.mjs",
+    "desktop:dev": "node tools/start-desktop.mjs --dev",
+    "desktop:start": "node tools/start-desktop.mjs",
+    "desktop:build": "npm run runtime:prepare && npm run build && electron-builder --win nsis --publish never",
+    "desktop:unpacked": "npm run runtime:prepare && npm run build && electron-builder --win --dir --publish never",
+    "test:desktop": "npm run runtime:prepare && node --test --test-concurrency=1 desktop/*.test.mjs",
+    "check": "npm run lint && npm test && npm run test:desktop && npm run test:school && npm run build",
+    "test:school": "node --test --test-concurrency=1 school/*.test.mjs",
+    "school:start": "node tools/start-school.mjs",
+    "verify:package": "node tools/verify-package.mjs",
+    "verify:credentials": "node tools/verify-credentials.mjs",
+    "verify:desktop-services": "node tools/verify-packaged-services.mjs",
+    "verify:desktop-ui": "node tools/verify-desktop-ui.mjs",
+    "school:maintenance": "node tools/school-maintenance.mjs",
+    "brand:generate": "node tools/generate-icon.mjs"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
+    "diff": "^8.0.2",
+    "file-saver": "^2.0.5",
+    "isomorphic-git": "^1.37.4",
+    "jszip": "^3.10.1",
+    "lucide-react": "^0.294.0",
+    "marked": "^9.1.6",
+    "monaco-editor": "^0.44.0",
+    "node-pty": "^1.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^5.2.0",
+    "autoprefixer": "^10.4.16",
+    "electron": "^45.1.0",
+    "electron-builder": "^26.18.0",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "jsdom": "^26.1.0",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.6",
+    "vite": "^7.3.7",
+    "npm": "^11.19.1"
+  },
+  "description": "Mench AI school coding workspace",
+  "author": "Mench AI",
+  "main": "desktop/main.mjs",
+  "build": {
+    "appId": "org.mench.workspace",
+    "productName": "Mench AI",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "desktop/**/*",
+      "package.json",
+      "!desktop/*.test.mjs",
+      "!school/*.test.mjs",
+      "school/provider.mjs",
+      "school/validation.mjs",
+      "shared/**/*"
+    ],
+    "asarUnpack": [
+      "node_modules/node-pty/**/*",
+      "desktop/pty-host.mjs"
+    ],
+    "extraResources": [
+      {
+        "from": "tools/runtime",
+        "to": "runtime",
+        "filter": [
+          "node.exe",
+          "LICENSE.txt",
+          "verified.json"
+        ]
+      },
+      {
+        "from": "tools/npm-runtime",
+        "to": "npm",
+        "filter": [
+          "**/*",
+          "!**/.cache/**/*"
+        ]
+      },
+      {
+        "from": "school",
+        "to": "school",
+        "filter": [
+          "**/*.mjs",
+          "!**/*.test.mjs"
+        ]
+      },
+      {
+        "from": "tools/npm-runtime/node_modules",
+        "to": "npm/node_modules",
+        "filter": [
+          "**/*",
+          "!**/.cache/**/*"
+        ]
+      },
+      {
+        "from": "shared",
+        "to": "shared",
+        "filter": [
+          "**/*.mjs"
+        ]
+      }
+    ],
+    "npmRebuild": false,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "signExecutable": false,
+      "icon": "desktop/assets/mench.ico",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "installerIcon": "desktop/assets/mench.ico",
+      "uninstallerIcon": "desktop/assets/mench.ico",
+      "installerHeaderIcon": "desktop/assets/mench.ico",
+      "createStartMenuShortcut": true,
+      "shortcutName": "Mench AI",
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "artifactName": "${productName}-Setup-${version}-${arch}.${ext}"
+    },
+    "publish": null
+  }
+}

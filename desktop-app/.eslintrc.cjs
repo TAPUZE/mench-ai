@@ -1,0 +1,18 @@
+module.exports={
+    root:true,
+    env:{browser:true,es2022:true},
+    parserOptions:{ecmaVersion:'latest',sourceType:'module',ecmaFeatures:{jsx:true}},
+    extends:['eslint:recommended','plugin:react/recommended','plugin:react/jsx-runtime','plugin:react-hooks/recommended'],
+    settings:{react:{version:'detect'}},
+    ignorePatterns:['node_modules/','dist/','release/','.local/','tools/runtime/','tools/npm-runtime/'],
+    rules:{
+        'react/prop-types':'off',
+        'react/jsx-uses-react':'error',
+        'react/no-unescaped-entities':['error',{forbid:['>','}']}],
+        'no-unused-vars':['error',{argsIgnorePattern:'^_',ignoreRestSiblings:true}],
+        'no-constant-condition':['error',{checkLoops:false}]
+    },
+    overrides:[
+        {files:['desktop/**/*','school/**/*','shared/**/*','tools/**/*','**/*.test.js','*.config.js','*.cjs'],env:{node:true}}
+    ]
+};
