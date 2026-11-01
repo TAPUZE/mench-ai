@@ -1,0 +1,349 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { marked } from 'marked';
+import { Menu, User, Plus, Settings, Video, BrainCircuit, LayoutTemplate, Send, Bot, Code, Eye, Pencil, X, Image as ImageIcon, Sparkles, Paperclip, LoaderCircle } from 'lucide-react';
+
+// --- System-Level Safety Instruction for the AI ---
+const safetyInstruction = `
+You are an Orthodox Jewish AI assistant designed to provide world-class education across ALL academic fields while maintaining Torah values. Your role is to be like an Orthodox Jewish professor at a top university.
+
+CORE EDUCATIONAL MISSION:
+1. ACADEMIC EXCELLENCE: Provide expert-level knowledge in ALL STEM fields, humanities, social sciences, arts, history, literature, languages, medicine, law, business, technology, and more
+2. TORAH PERSPECTIVE: Frame all knowledge within an Orthodox Jewish worldview - seeing all wisdom as emanating from השם
+3. COMPREHENSIVE ACCESS: NEVER block legitimate educational content - users must have access to all fields of study
+4. RELIGIOUS INTEGRATION: Show how each field of study can serve השם and benefit humanity
+
+EDUCATIONAL APPROACH:
+- Respond as a specialist professor in the relevant field (math professor for math, scientist for science, etc.)
+- Provide complete, accurate, professional-level information
+- Include Orthodox Jewish perspective when naturally relevant
+- Acknowledge that all knowledge comes from divine wisdom
+- Show practical applications that align with Torah values
+- Encourage learning as a form of serving השם
+
+ALWAYS ALLOW (Educational Content):
+✅ ALL STEM subjects (mathematics, physics, chemistry, biology, computer science, engineering, etc.)
+✅ Medical and health sciences (anatomy, physiology, medicine, psychology, etc.)
+✅ Social sciences (psychology, sociology, economics, political science, etc.)
+✅ Arts and literature (analysis from appropriate perspective)
+✅ History and geography (all periods and regions)
+✅ Languages and linguistics (all languages)
+✅ Philosophy and ethics (from Jewish perspective)
+✅ Business and economics
+✅ Technology and innovation
+✅ Sports science and physical education (health benefits, teamwork, discipline)
+✅ Cultural studies (understanding different societies)
+✅ PROGRAMMING AND WEB DEVELOPMENT (HTML, CSS, JavaScript, React, Node.js, databases, etc.)
+✅ WEBSITE BUILDING (landing pages, portfolios, business sites, educational platforms, etc.)
+✅ SOFTWARE DEVELOPMENT (applications, tools, systems, algorithms, data structures, etc.)
+✅ TECHNICAL TUTORIALS (coding guides, development tutorials, technical documentation, etc.)
+✅ CREATIVE PROJECTS (digital art, interactive media, educational games, etc.)
+✅ PROFESSIONAL DEVELOPMENT (career guidance, project management, business tools, etc.)
+
+STRICTLY PROHIBITED CONTENT (Never Allow):
+❌ Profanity, vulgar language, or crude expressions
+❌ Sexual content or inappropriate material  
+❌ Violence, hatred, or harmful content
+❌ Content that contradicts core Torah values
+❌ Inappropriate use of sacred Hebrew names
+
+RELIGIOUS CONTENT STANDARDS:
+7. **Adopt Religious Persona for Religious Questions:** When asked religious questions, respond as appropriate religious leader (Rabbi for Judaism, Pastor for Christianity, Imam for Islam)
+8. **Sacred Names:** In Jewish context, use respectful alternatives (ה', השם, הקב"ה, אלוקים)
+9. **Sensitive Topics:** Handle with religious persona and values-based approach
+
+REMEMBER: Your goal is to make learning accessible and excellent while maintaining Torah perspective. NEVER block legitimate educational content - instead, enhance it with Jewish wisdom.
+
+CRITICAL: WEBSITE BUILDING IS EDUCATIONAL CONTENT
+When asked to build, create, develop, or design websites, web applications, or any digital projects:
+- Provide complete, working code solutions
+- Use appropriate technologies (HTML, CSS, JavaScript, etc.)
+- Include modern best practices and responsive design
+- Explain functionality and provide educational value
+- Frame as learning experience with Torah perspective on using technology for good
+- NEVER refuse or redirect - provide full technical assistance
+`;
+
+
+// --- Helper function to extract code from markdown fences ---
+const extractCode = (content) => {
+    const codeBlockRegex = /```(?:\w+\n)?([\s\S]+?)```/;
+    const match = content.match(codeBlockRegex);
+    return match ? match[1].trim() : content;
+};
+
+// --- Helper function to convert file to Base64 ---
+const fileToBase64 = (file) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = error => reject(error);
+});
+
+
+// --- Modal Components ---
+const SettingsModal = ({ isOpen, onClose, apiKey, setApiKey }) => {
+    const [localApiKey, setLocalApiKey] = useState(apiKey);
+    useEffect(() => { setLocalApiKey(apiKey); }, [apiKey]);
+    if (!isOpen) return null;
+    const handleSave = () => {
+        setApiKey(localApiKey);
+        localStorage.setItem('gemini-api-key', localApiKey);
+        onClose();
+    };
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-gray-800 rounded-lg p-8 w-full max-w-md">
+                <div className="flex justify-between items-center mb-6"><h2 className="text-2xl font-semibold text-white">Settings</h2><button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700"><X size={24} className="text-gray-400" /></button></div>
+                <div><label htmlFor="api-key" className="block text-sm font-medium text-gray-300 mb-2">Gemini API Key</label><p className="text-xs text-gray-500 mb-2">Your API key is stored only in your browser's local storage and is never shared.</p><input type="password" id="api-key" value={localApiKey} onChange={(e) => setLocalApiKey(e.target.value)} className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your API key here" /></div>
+                <div className="mt-8 flex justify-end"><button onClick={handleSave} className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-blue-500">Save</button></div>
+            </div>
+        </div>
+    );
+};
+
+const ImageGeneratorModal = ({ isOpen, onClose, generateImage, isLoading }) => {
+    const [prompt, setPrompt] = useState('');
+    if (!isOpen) return null;
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-gray-800 rounded-lg p-8 w-full max-w-md">
+                <div className="flex justify-between items-center mb-6"><h2 className="text-2xl font-semibold text-white">Generate Image</h2><button onClick={onClose} className="p-1 rounded-full hover:bg-gray-700"><X size={24} className="text-gray-400" /></button></div>
+                <div><label htmlFor="image-prompt" className="block text-sm font-medium text-gray-300 mb-2">Prompt</label><textarea id="image-prompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} className="w-full bg-gray-900 border border-gray-700 rounded-md p-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3" placeholder="e.g., A beautiful sunset over Jerusalem" /></div>
+                <div className="mt-8 flex justify-end">
+                    <button onClick={() => generateImage(prompt)} className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-600 flex items-center gap-2" disabled={isLoading || !prompt.trim()}>
+                        {isLoading ? <><LoaderCircle size={20} className="animate-spin" /> Generating...</> : 'Generate'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const CanvasView = ({ content, setContent }) => {
+    const [view, setView] = useState('edit');
+    const [isHtml, setIsHtml] = useState(false);
+    useEffect(() => { const hasHtml = /<[a-z][\s\S]*>/i.test(content); setIsHtml(hasHtml); if (!hasHtml) { setView('edit'); } }, [content]);
+    return (
+        <div className="flex flex-col h-full">
+            <div className="flex items-center justify-between mb-4"><h2 className="text-2xl font-semibold text-gray-300">Canvas</h2>{isHtml && (<div className="flex items-center gap-2 rounded-lg bg-gray-800 p-1"><button onClick={() => setView('edit')} className={`px-3 py-1 text-sm rounded-md flex items-center gap-2 ${view === 'edit' ? 'bg-gray-700' : 'hover:bg-gray-700'}`}><Pencil size={16} /> Edit</button><button onClick={() => setView('preview')} className={`px-3 py-1 text-sm rounded-md flex items-center gap-2 ${view === 'preview' ? 'bg-gray-700' : 'hover:bg-gray-700'}`}><Eye size={16} /> Preview</button></div>)}</div>
+            <div className="flex-grow">{view === 'preview' && isHtml ? (<iframe srcDoc={content} title="Canvas Preview" className="w-full h-full bg-white border border-gray-700 rounded-lg" sandbox="allow-scripts allow-same-origin" />) : (<textarea value={content} onChange={(e) => setContent(e.target.value)} className="w-full h-full bg-gray-800 border border-gray-700 rounded-lg p-4 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-mono text-sm" placeholder="Generate code and switch to Canvas mode to see it here." />)}</div>
+        </div>
+    );
+};
+
+
+// --- Main App Component ---
+export default function App() {
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [currentChat, setCurrentChat] = useState([]);
+    const [input, setInput] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [isImageLoading, setIsImageLoading] = useState(false);
+    const [isCanvasMode, setIsCanvasMode] = useState(false);
+    const [canvasContent, setCanvasContent] = useState('');
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isImageGeneratorOpen, setIsImageGeneratorOpen] = useState(false);
+    const [apiKey, setApiKey] = useState('');
+    const [uploadedFile, setUploadedFile] = useState(null);
+    const userName = 'User'; // Hardcoded user name
+
+    const chatEndRef = useRef(null);
+    const textareaRef = useRef(null);
+    const fileInputRef = useRef(null);
+
+    // --- Load chat history and API key from localStorage on initial render ---
+    useEffect(() => {
+        try {
+            const savedChat = localStorage.getItem('gemini-clone-chat');
+            if (savedChat) {
+                setCurrentChat(JSON.parse(savedChat));
+            }
+            const savedApiKey = localStorage.getItem('gemini-api-key');
+            if (savedApiKey) {
+                setApiKey(savedApiKey);
+            }
+        } catch (error) {
+            console.error("Failed to load data from local storage:", error);
+        }
+    }, []);
+
+    // --- Save chat history to localStorage whenever it changes ---
+    useEffect(() => {
+        if (currentChat.length > 0) {
+            try {
+                localStorage.setItem('gemini-clone-chat', JSON.stringify(currentChat));
+            } catch (error) {
+                console.error("Failed to save chat to local storage:", error);
+            }
+        }
+    }, [currentChat]);
+
+    // --- Auto-resize textarea ---
+    useEffect(() => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = 'auto';
+            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+        }
+    }, [input]);
+
+    // --- Scroll to bottom of chat ---
+    useEffect(() => {
+        if (!isCanvasMode) {
+            chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [currentChat, isCanvasMode]);
+
+    const handleCanvasToggle = () => { const newMode = !isCanvasMode; if (newMode && currentChat.length > 0) { const lastModelMessage = [...currentChat].reverse().find(msg => msg.role === 'model'); if (lastModelMessage) { const codeToCanvas = extractCode(lastModelMessage.content); setCanvasContent(codeToCanvas); } else { setCanvasContent(''); } } setIsCanvasMode(newMode); };
+    const handleNewChat = () => { setCurrentChat([]); setIsCanvasMode(false); setCanvasContent(''); setUploadedFile(null); localStorage.removeItem('gemini-clone-chat'); };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setUploadedFile(file);
+        }
+    };
+
+    const handleSend = async (mode = 'normal') => {
+        if (!input.trim() && !uploadedFile) return;
+        if (!apiKey) { setIsSettingsOpen(true); return; }
+
+        let currentInput = input;
+        if (mode === 'deep_research') {
+            currentInput = `Provide a comprehensive, in-depth research report on the following topic: ${input}`;
+        }
+
+        const newUserMessage = { role: 'user', content: currentInput, file: uploadedFile ? uploadedFile.name : null };
+        const updatedChat = [...currentChat, newUserMessage];
+        setCurrentChat(updatedChat);
+
+        setInput('');
+        setIsLoading(true);
+
+        try {
+            const apiHistory = updatedChat.map(msg => ({
+                role: msg.role === 'model' ? 'model' : 'user',
+                parts: [{ text: msg.content }]
+            }));
+            
+            if (uploadedFile) {
+                const base64Data = await fileToBase64(uploadedFile);
+                const lastUserMessage = apiHistory[apiHistory.length - 1];
+                lastUserMessage.parts.push({
+                    inline_data: {
+                        mime_type: uploadedFile.type,
+                        data: base64Data
+                    }
+                });
+                setUploadedFile(null);
+            }
+
+
+            const payload = {
+                contents: apiHistory,
+                system_instruction: { parts: [{ text: safetyInstruction }] }
+            };
+            
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+
+            const result = await response.json();
+            if (!response.ok) {
+                 const errorDetail = result.error?.message || `API call failed with status: ${response.status}`;
+                 throw new Error(errorDetail);
+            }
+            
+            let modelResponseText = "Sorry, I couldn't get a response. Please try again.";
+            if (result.promptFeedback?.blockReason) { modelResponseText = "This prompt was blocked by the safety filter. Please try a different topic."; }
+            else if (result.candidates?.[0]?.content?.parts?.[0]) { modelResponseText = result.candidates[0].content.parts[0].text; }
+            
+            const modelMessage = { role: 'model', content: modelResponseText };
+            setCurrentChat(prevChat => [...prevChat, modelMessage]);
+
+            if (isCanvasMode) { const codeToCanvas = extractCode(modelResponseText); setCanvasContent(prev => (prev ? prev + '\n\n---\n\n' : '') + codeToCanvas); }
+
+        } catch (error) {
+            console.error("Error calling Gemini API:", error);
+            const errorMessage = { role: 'model', content: `Sorry, an error occurred. **Details:** ${error.message}` };
+            setCurrentChat(prevChat => [...prevChat, errorMessage]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
+    const handleGenerateImage = async (prompt) => {
+        if (!prompt.trim() || !apiKey) {
+            if (!apiKey) setIsSettingsOpen(true);
+            return;
+        }
+        setIsImageLoading(true);
+        try {
+            const safePrompt = `A safe, appropriate image for a religious adult audience, with no explicit content, violence, or profanity, depicting: ${prompt}`;
+            const payload = { instances: [{ prompt: safePrompt }], parameters: { "sampleCount": 1 } };
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            
+            const result = await response.json();
+            if (!response.ok) {
+                 const errorDetail = result.error?.message || `Image generation failed with status: ${response.status}`;
+                 throw new Error(errorDetail);
+            }
+            
+            if (result.predictions?.[0]?.bytesBase64Encoded) {
+                const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                const imageMessage = { role: 'model', content: `Here is the image you requested for "${prompt}":\n\n![Generated Image](${imageUrl})` };
+                setCurrentChat(prev => [...prev, imageMessage]);
+                setIsImageGeneratorOpen(false);
+            } else {
+                if (result.error) { throw new Error(result.error.message); }
+                throw new Error("No image data received from API. The response format might be unexpected.");
+            }
+        } catch (error) {
+            console.error("Error generating image:", error);
+            const errorMessage = { role: 'model', content: `Sorry, I couldn't generate the image. **Details:** ${error.message}` };
+            setCurrentChat(prev => [...prev, errorMessage]);
+        } finally {
+            setIsImageLoading(false);
+        }
+    };
+
+
+    const handleKeyPress = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } };
+    const renderContent = (content) => { return <div dangerouslySetInnerHTML={{ __html: marked(content) }} className="prose prose-invert max-w-none prose-p:text-gray-300 prose-headings:text-white prose-img:rounded-lg prose-img:max-w-md" />; };
+
+    return (
+        <div className="flex h-screen bg-gray-900 text-gray-200 font-sans">
+            <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} apiKey={apiKey} setApiKey={setApiKey} />
+            <ImageGeneratorModal isOpen={isImageGeneratorOpen} onClose={() => setIsImageGeneratorOpen(false)} generateImage={handleGenerateImage} isLoading={isImageLoading} />
+            
+            <div className={`bg-gray-800 flex flex-col transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-0'} overflow-hidden`}>
+                <div className="p-4 flex-shrink-0"><h1 className="text-xl font-semibold">Gemini</h1><p className="text-sm text-gray-400">2.5 Pro</p></div>
+                <div className="p-2 flex-shrink-0"><button onClick={handleNewChat} className="w-full flex items-center justify-between p-2 rounded-md hover:bg-gray-700"><span>New Chat</span><Plus size={18} /></button></div>
+                <div className="flex-grow p-2 overflow-y-auto"><p className="text-xs text-gray-500 px-2">Recent</p></div>
+                <div className="p-4 flex-shrink-0"><button onClick={() => setIsSettingsOpen(true)} className="w-full flex items-center p-2 rounded-md hover:bg-gray-700 relative"><Settings size={18} className="mr-3" /><span>Settings</span>{!apiKey && <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500" title="API Key is missing"></span>}</button></div>
+            </div>
+
+            <div className="flex-1 flex flex-col max-h-screen">
+                <header className="flex items-center justify-between p-4 border-b border-gray-700 flex-shrink-0"><button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-full hover:bg-gray-700"><Menu size={20} /></button><div className="flex items-center gap-4"><button className="px-4 py-2 text-sm font-medium bg-blue-600 rounded-md hover:bg-blue-700">Invite a friend</button><div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center"><User size={24} /></div></div></header>
+
+                <main className="flex-1 overflow-y-auto p-4 md:p-6"><div className="max-w-4xl mx-auto h-full">{isCanvasMode ? (<CanvasView content={canvasContent} setContent={setCanvasContent} />) : currentChat.length === 0 ? (<div className="text-center mt-20"><h2 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Hello, {userName}</h2><p className="mt-4 text-gray-400 text-lg">How can I help you today?</p></div>) : (<div className="space-y-8">{currentChat.map((msg, index) => (<div key={index} className="flex gap-4"><div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0 mt-1">{msg.role === 'user' ? <User size={20} /> : <Bot size={20} className="text-blue-400" />}</div><div className="flex-1"><p className="font-bold mb-2 capitalize">{msg.role === 'user' ? userName : 'Gemini'}</p>{renderContent(msg.content)}</div></div>))}{isLoading && (<div className="flex gap-4"><div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0 mt-1"><Bot size={20} className="text-blue-400 animate-pulse" /></div><div className="flex-1 pt-2"><div className="w-10 h-4 bg-gray-700 rounded animate-pulse"></div></div></div>)}<div ref={chatEndRef} /></div>)}</div></main>
+
+                <footer className="p-4 md:p-6 flex-shrink-0">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="bg-gray-800 rounded-2xl p-4 flex items-start gap-4 focus-within:ring-2 focus-within:ring-blue-500">
+                           <textarea ref={textareaRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={handleKeyPress} placeholder="Enter a prompt here" className="flex-1 bg-transparent focus:outline-none resize-none max-h-48" rows="1" />
+                           {uploadedFile && (<div className="bg-gray-700 text-xs text-gray-300 rounded-full px-3 py-1 flex items-center gap-2"><span>{uploadedFile.name}</span><button onClick={() => setUploadedFile(null)} className="hover:text-white"><X size={14} /></button></div>)}
+                            <button onClick={() => handleSend()} className="bg-blue-600 p-3 rounded-full hover:bg-blue-700 disabled:bg-gray-600 self-end" disabled={isLoading || (!input.trim() && !uploadedFile)}><Send size={20} /></button>
+                        </div>
+                        <div className="flex items-center justify-center flex-wrap gap-4 mt-3">
+                            <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
+                            <button onClick={() => fileInputRef.current.click()} className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg hover:bg-gray-700"><Paperclip size={16} /><span>Add File</span></button>
+                            <button onClick={() => setIsImageGeneratorOpen(true)} className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg hover:bg-gray-700"><Sparkles size={16} /><span>Generate Image</span></button>
+                            <button onClick={() => handleSend('deep_research')} className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg hover:bg-gray-700"><BrainCircuit size={16} /><span>Deep Research</span></button>
+                            <button onClick={handleCanvasToggle} className={`flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg hover:bg-gray-700 ${isCanvasMode ? 'bg-gray-700 text-blue-400' : ''}`}><LayoutTemplate size={16} /><span>{isCanvasMode ? 'Chat View' : 'Canvas'}</span></button>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    );
+}

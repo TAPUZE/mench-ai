@@ -1,0 +1,19 @@
+node_modules
+dist/
+.local/
+release/
+tools/runtime/
+tools/npm-runtime/
+
+# Local credentials, school data and generated logs
+.env
+.env.*
+!.env.example
+*.log
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.pem
+*.key
+credentials.enc

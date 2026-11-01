@@ -1,5 +1,16 @@
 # Mench-ai: A Blueprint for a Kosher AI Academic Tutor
 
+## Windows desktop app
+
+The Windows-first coding workspace is in [`desktop-app`](desktop-app/README.md).
+It includes the VS Code-style editor, native projects, terminal, project preview,
+Git, school gateway and classrooms, plus distinct English-speaking and Israeli
+community frameworks. Start with its [local setup](desktop-app/LOCAL_SETUP.md)
+and [release readiness](desktop-app/BUILD_READINESS.md).
+
+The existing `backend` and `frontend` directories contain the earlier web app.
+The desktop app has its own package manifest, lockfile, and commands.
+
 ## Overview
 
 Mench-ai is a sophisticated AI tutoring platform designed to provide world-class academic education within a "kosher" digital environment. The platform operates as a high-level conversational AI tutor, comparable to leading models like Gemini 2.5, but with robust, values-centric architecture ensuring every interaction is safe, respectful, and aligned with Orthodox Jewish principles.

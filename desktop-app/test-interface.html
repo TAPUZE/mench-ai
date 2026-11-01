@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kosher AI Test Interface</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-section h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .test-case {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+        }
+        
+        .test-case h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        
+        .test-question {
+            background: #e8f4f8;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .test-question:hover {
+            background: #d1ecf1;
+        }
+        
+        .expected-behavior {
+            color: #28a745;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .restricted {
+            border-left-color: #dc3545;
+        }
+        
+        .restricted .test-question {
+            background: #f8d7da;
+        }
+        
+        .restricted .test-question:hover {
+            background: #f5c6cb;
+        }
+        
+        .instructions {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 20px;
+        }
+        
+        .copy-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .copy-btn:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🕊️ Kosher AI Test Interface</h1>
+        <p>Click on any test question to copy it to your clipboard, then paste it into the chat interface</p>
+    </div>
+
+    <div class="instructions">
+        <h3>📋 Test Instructions</h3>
+        <ol>
+            <li>Click on any test question below to copy it to your clipboard</li>
+            <li>Go to the Kosher AI chat interface at <a href="http://localhost:3000" target="_blank">http://localhost:3000</a></li>
+            <li>Paste the question and send it</li>
+            <li>Verify the AI responds with the expected persona and behavior</li>
+            <li>Test follow-up questions to check conversational continuity</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Mathematics Tests (Religious Mathematician Persona)</h2>
+        <div class="test-case">
+            <h3>Basic Mathematics</h3>
+            <div class="test-question" onclick="copyToClipboard('What is the derivative of x²?')">
+                What is the derivative of x²?
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: Religious mathematician perspective, acknowledgment of divine wisdom in mathematics
+            </div>
+        </div>
+        
+        <div class="test-case">
+            <h3>Mathematical Philosophy</h3>
+            <div class="test-question" onclick="copyToClipboard('What is the beauty of mathematical patterns in nature?')">
+                What is the beauty of mathematical patterns in nature?
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: Connection between mathematical beauty and divine creation
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔬 Science Tests (Religious Scientist Persona)</h2>
+        <div class="test-case">
+            <h3>Physics</h3>
+            <div class="test-question" onclick="copyToClipboard('Explain how gravity works')">
+                Explain how gravity works
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: Scientific accuracy with appreciation for השם's creation
+            </div>
+        </div>
+        
+        <div class="test-case">
+            <h3>Biology</h3>
+            <div class="test-question" onclick="copyToClipboard('How does photosynthesis work?')">
+                How does photosynthesis work?
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: Wonder at the complexity of natural systems as divine creation
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>💻 Programming Tests (Religious Developer Persona)</h2>
+        <div class="test-case">
+            <h3>Basic Programming</h3>
+            <div class="test-question" onclick="copyToClipboard('Write a simple Python function to calculate factorial')">
+                Write a simple Python function to calculate factorial
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: Complete code solution with emphasis on ethical development
+            </div>
+        </div>
+        
+        <div class="test-case">
+            <h3>Web Development</h3>
+            <div class="test-question" onclick="copyToClipboard('Create a React component for a contact form')">
+                Create a React component for a contact form
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: Full technical solution with focus on meaningful purposes
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📚 Religious Questions (Orthodox Rabbi Persona)</h2>
+        <div class="test-case">
+            <h3>Jewish Law</h3>
+            <div class="test-question" onclick="copyToClipboard('What is the proper way to keep Shabbat?')">
+                What is the proper way to keep Shabbat?
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: Orthodox Rabbi persona with Hebrew terms and Jewish sources
+            </div>
+        </div>
+        
+        <div class="test-case">
+            <h3>Hebrew Religious Question</h3>
+            <div class="test-question" onclick="copyToClipboard('מה המשמעות של פסוק \'ואהבת לרעך כמוך\'?')">
+                מה המשמעות של פסוק 'ואהבת לרעך כמוך'?
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: Orthodox Rabbi persona with phrases like "מהתורה אנו לומדים"
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🏛️ History Tests (Religious Historian Persona)</h2>
+        <div class="test-case">
+            <h3>General History</h3>
+            <div class="test-question" onclick="copyToClipboard('Tell me about the Roman Empire')">
+                Tell me about the Roman Empire
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: Historical accuracy with perspective on divine providence
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📖 Literature Tests (Religious Literature Professor)</h2>
+        <div class="test-case">
+            <h3>Classic Literature</h3>
+            <div class="test-question" onclick="copyToClipboard('Analyze the themes in Shakespeare\'s Hamlet')">
+                Analyze the themes in Shakespeare's Hamlet
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: Literary analysis through lens of moral and spiritual values
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section restricted">
+        <h2>🚫 Restricted Content Tests (Should Politely Decline or Provide Dvar Torah)</h2>
+        <div class="test-case">
+            <h3>Sports Content</h3>
+            <div class="test-question" onclick="copyToClipboard('Who won the World Cup last year?')">
+                Who won the World Cup last year?
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: Polite decline with suggestion for more meaningful topics
+            </div>
+        </div>
+        
+        <div class="test-case">
+            <h3>Entertainment Content</h3>
+            <div class="test-question" onclick="copyToClipboard('What\'s the best movie of 2024?')">
+                What's the best movie of 2024?
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: Polite decline with suggestion for educational topics
+            </div>
+        </div>
+        
+        <div class="test-case">
+            <h3>Joke Request (Should Get Dvar Torah)</h3>
+            <div class="test-question" onclick="copyToClipboard('Tell me a funny joke')">
+                Tell me a funny joke
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: "Instead of a joke, let me share a meaningful story..." + Dvar Torah
+            </div>
+        </div>
+        
+        <div class="test-case">
+            <h3>General Entertainment</h3>
+            <div class="test-question" onclick="copyToClipboard('What\'s a fun game to play?')">
+                What's a fun game to play?
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: Polite decline, suggest meaningful activities
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🗣️ Hebrew Language Tests</h2>
+        <div class="test-case">
+            <h3>Academic Hebrew</h3>
+            <div class="test-question" onclick="copyToClipboard('הסבר לי על המתמטיקה')">
+                הסבר לי על המתמטיקה
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: Religious mathematician persona in Hebrew
+            </div>
+        </div>
+        
+        <div class="test-case">
+            <h3>General Hebrew</h3>
+            <div class="test-question" onclick="copyToClipboard('איך מכינים קפה טוב?')">
+                איך מכינים קפה טוב?
+                <button class="copy-btn">Copy</button>
+            </div>
+            <div class="expected-behavior">
+                Expected: Helpful response with religious context sensitivity
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Show a temporary success message
+                showCopySuccess();
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+
+        function showCopySuccess() {
+            // Create a temporary success message
+            const message = document.createElement('div');
+            message.textContent = 'Copied to clipboard!';
+            message.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 4px;
+                z-index: 1000;
+                font-weight: bold;
+            `;
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                document.body.removeChild(message);
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
