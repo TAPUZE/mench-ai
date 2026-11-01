@@ -13,6 +13,6 @@ module.exports={
         'no-constant-condition':['error',{checkLoops:false}]
     },
     overrides:[
-        {files:['desktop/**/*','school/**/*','shared/**/*','tools/**/*','**/*.test.js','*.config.js','*.cjs'],env:{node:true}}
+        {files:['desktop/**/*','school/**/*','shared/**/*','tools/**/*','web/**/*','**/*.test.js','*.config.js','*.cjs'],env:{node:true}}
     ]
 };
