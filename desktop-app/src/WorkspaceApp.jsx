@@ -450,7 +450,7 @@ export default function WorkspaceApp() {
                     <section className="mw-start"><h2>Start building</h2>
                         <button className="mw-start-action" onClick={() => startNew(null)} disabled={busy}><span className="mw-start-icon"><Plus size={21}/></span><span><strong>New project</strong><small>Start fresh, in a folder you choose</small></span><ArrowRight size={18}/></button>
                         <button className="mw-start-action" onClick={openProject} disabled={busy}><span className="mw-start-icon"><FolderOpen size={20}/></span><span><strong>Open project</strong><small>Pick up where you left off</small></span><ArrowRight size={18}/></button>
-                        <p className="mw-start-note">No setup needed to start coding.<br/>Connect AI whenever you’re ready.</p>
+                        <p className="mw-start-note">No setup needed to start coding.<br/>Connect AI whenever you’re ready.{!desktop()&&<><br/>Use Chrome or Edge for local folders. Terminal and Git are in the Windows app.</>}</p>
                     </section>
                     <section className="mw-recent"><div className="mw-section-heading"><h2>Recent projects</h2><span>{recents.length ? String(recents.length).padStart(2,'0') : '—'}</span></div>
                         {recents.length ? <div>{recents.map(recent => <button className="mw-recent-project" key={recent.id} onClick={() => openRecent(recent)} disabled={busy}><span><strong>{recent.name}</strong><small>{recent.location}</small></span><ChevronRight size={15}/></button>)}</div> : <div className="mw-recent-empty"><div className="mw-empty-lines"><span/><span/><span/></div><p>Your next project belongs here.</p><small>Projects you create or open will appear in this list.</small></div>}

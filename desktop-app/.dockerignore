@@ -1,0 +1,13 @@
+node_modules
+dist
+.git
+.local
+release
+tools/runtime
+tools/npm-runtime
+.env
+.env.*
+*.log
+*.sqlite*
+*.db*
+credentials.enc

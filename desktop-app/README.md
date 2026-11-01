@@ -25,6 +25,26 @@ Live AI needs a Gemini API key configured in personal Settings or centrally on
 the school gateway. School profiles and sources require actual school approval.
 Do not use fixture approvals as deployment approval.
 
+## Railway browser deployment
+
+Railway serves the browser workspace from this directory's Dockerfile. Set the
+service root to `/desktop-app`, Dockerfile path to `Dockerfile`, and healthcheck to `/healthz`.
+These are service settings; no deprecated `railway.json` configuration is needed.
+The production server binds Railway's `PORT` on all interfaces and exposes
+`/healthz`; it serves only the compiled `dist` directory. No database or volume
+is needed for the browser workspace. Projects stay in each user's chosen local
+folders, with browser-local settings and recent-project references.
+
+Live browser AI uses the Gemini key each user enters in Settings. Do not place a
+shared key in frontend environment variables. Managed school accounts, source
+approval screens, native terminal and Git remain desktop/service features.
+Chrome or Edge is required for the browser's local-folder APIs.
+
+Run the same web server locally with `npm run build` and `npm run web:start`.
+The Docker build skips Electron/native install scripts because the web bundle
+does not use them; the runtime image contains only Node, compiled assets and
+the production static server.
+
 ## Verify and package
 
 ```powershell
